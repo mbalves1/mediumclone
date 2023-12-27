@@ -1,9 +1,9 @@
-import { ConnectableConfig } from 'typeorm';
+import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 
-const config: ConnectableConfig = {
+const config: PostgresConnectionOptions = {
   type: 'postgres',
   host: 'localhost',
-  port: 5432,
+  port: 5439,
   username: 'mediumclone',
   password: '123',
   database: 'mediumclone',
