@@ -10,8 +10,9 @@ import {
 import { TagService } from './tag.service';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
+// import { TagEntity } from './entities/tag.entity';
 
-@Controller('tag')
+@Controller('tags')
 export class TagController {
   constructor(private readonly tagService: TagService) {}
 
@@ -21,8 +22,11 @@ export class TagController {
   }
 
   @Get()
-  findAll(): string[] {
-    return this.tagService.findAll();
+  async findAll(): Promise<{ tags: string[] }> {
+    const tags = await this.tagService.findAll();
+    return {
+      tags: tags.map((tag) => tag.name),
+    };
   }
 
   @Get(':id')
