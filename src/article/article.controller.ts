@@ -1,19 +1,21 @@
 import {
   Controller,
-  // Get,
+  Get,
   Post,
   Body,
+  Param,
   UseGuards,
-  // Patch,
-  // Param,
-  // Delete,
+  Delete,
+  Put,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ArticleService } from './article.service';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { AuthGuard } from '@app/guards/auth.guard';
 import { User } from '@app/user/decorators/user.decorator';
 import { UserEntity } from '@app/user/entities/user.entity';
-// import { UpdateArticleDto } from './dto/update-article.dto';
+import { ArticleResponseInterface } from './types/articlesResponse.interface';
 
 @Controller('article')
 export class ArticleController {
@@ -21,34 +23,49 @@ export class ArticleController {
 
   @Post()
   @UseGuards(AuthGuard)
+  @UsePipes(new ValidationPipe())
   async create(
     @User() currentUser: UserEntity,
     @Body('article') createArticleDto: CreateArticleDto,
-  ): Promise<any> {
-    console.log('aqui');
-    return await this.articleService.createArticle(
+  ): Promise<ArticleResponseInterface> {
+    const article = await this.articleService.createArticle(
       currentUser,
       createArticleDto,
     );
+    return this.articleService.buildArticleResponse(article);
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.articleService.findAll();
-  // }
+  @Get(':slug')
+  async getSingleArticle(
+    @Param('slug') slug: string,
+  ): Promise<ArticleResponseInterface> {
+    const article = await this.articleService.findBySlug(slug);
+    return this.articleService.buildArticleResponse(article);
+  }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.articleService.findOne(+id);
-  // }
+  @Delete(':slug')
+  @UseGuards(AuthGuard)
+  async deleteArticle(
+    @User('id') currentUserId: number,
+    @Param('slug') slug: string,
+  ) {
+    return await this.articleService.deleteArticle(slug, currentUserId);
+  }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateArticleDto: UpdateArticleDto) {
-  //   return this.articleService.update(+id, updateArticleDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.articleService.remove(+id);
-  // }
+  @Put(':slug')
+  @UseGuards(AuthGuard)
+  @UsePipes(new ValidationPipe())
+  async updateArticle(
+    @User('id') currentUserId: number,
+    @Param('slug') slug: string,
+    @Body('article') updateArticleDto: CreateArticleDto,
+  ) {
+    const article = await this.articleService.updateArticle(
+      slug,
+      updateArticleDto,
+      currentUserId,
+    );
+    console.log('updateArticleDto', updateArticleDto);
+    return await this.articleService.buildArticleResponse(article);
+  }
 }
