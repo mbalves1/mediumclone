@@ -96,4 +96,13 @@ export class UserService {
       },
     });
   }
+
+  async updateUser(
+    userId: number,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserEntity> {
+    const user = await this.finById(userId);
+    Object.assign(user, updateUserDto);
+    return await this.userRepository.save(user);
+  }
 }
