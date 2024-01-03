@@ -2,17 +2,31 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateArticleDto } from './dto/create-article.dto';
 import { ArticleEntity } from './entities/article.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, Repository } from 'typeorm';
+import { DataSource, DeleteResult, Repository } from 'typeorm';
 import { UserEntity } from '@app/user/entities/user.entity';
-import { ArticleResponseInterface } from './types/articlesResponse.interface';
+import { ArticleResponseInterface } from './types/articleResponse.interface';
 import slugify from 'slugify';
+import { ArticlesResponseInterface } from './types/articlesResponse.interface';
 
 @Injectable()
 export class ArticleService {
   constructor(
     @InjectRepository(ArticleEntity)
     private readonly articleRepository: Repository<ArticleEntity>,
+    private dataSource: DataSource,
   ) {}
+
+  async findAll(
+    currentUserId: number,
+    query: any,
+  ): Promise<ArticlesResponseInterface> {
+    const queryBuilder = this.dataSource.getRepository(ArticleEntity);
+
+    console.log('>>', queryBuilder);
+    const articles = await queryBuilder.getMany();
+    const articlesCount = await queryBuilder.getCount();
+    return { articles, articlesCount };
+  }
 
   async createArticle(
     currentUser: UserEntity,
