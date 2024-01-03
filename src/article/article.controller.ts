@@ -19,7 +19,7 @@ import { UserEntity } from '@app/user/entities/user.entity';
 import { ArticleResponseInterface } from './types/articleResponse.interface';
 import { ArticlesResponseInterface } from './types/articlesResponse.interface';
 
-@Controller('article')
+@Controller('articles')
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
@@ -75,7 +75,7 @@ export class ArticleController {
       updateArticleDto,
       currentUserId,
     );
-    console.log('updateArticleDto', updateArticleDto);
+
     return await this.articleService.buildArticleResponse(article);
   }
 }
