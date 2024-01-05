@@ -18,6 +18,9 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<UserEntity> {
+    const errorResponse = {
+      errors: {},
+    };
     const userByEmail = await this.userRepository.findOne({
       where: {
         email: createUserDto.email,
@@ -28,11 +31,17 @@ export class UserService {
         username: createUserDto.username,
       },
     });
+
+    if (userByEmail) {
+      errorResponse.errors['email'] = 'Email is already in use';
+    }
+
+    if (userByName) {
+      errorResponse.errors['username'] = 'Has already been taken';
+    }
+
     if (userByEmail || userByName) {
-      throw new HttpException(
-        'Email ou usuário já cadastrado!',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
+      throw new HttpException(errorResponse, HttpStatus.UNPROCESSABLE_ENTITY);
     }
     const newUser = new UserEntity();
     Object.assign(newUser, createUserDto);
@@ -60,6 +69,11 @@ export class UserService {
   }
 
   async login(loginUserDto: LoginUserDto): Promise<UserEntity> {
+    const errorResponse = {
+      errors: {
+        'email or password': 'is invalid',
+      },
+    };
     const user = await this.userRepository.findOne({
       where: {
         email: loginUserDto.email,
@@ -68,10 +82,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new HttpException(
-        'Credencial não valida',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
+      throw new HttpException(errorResponse, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     const isPasswordIsCorrect = await compare(
