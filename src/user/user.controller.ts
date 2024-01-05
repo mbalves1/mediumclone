@@ -22,11 +22,11 @@ import { AuthGuard } from '@app/guards/auth.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { BackendValidationPipe } from '@app/shared/pipes/backendValidation.pipe';
 
-@Controller('api')
+@Controller()
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
+  @Post('users')
   @UsePipes(new BackendValidationPipe())
   async create(
     @Body('user') createUserDto: CreateUserDto,
@@ -35,7 +35,7 @@ export class UserController {
     return this.userService.buildUserResponse(user);
   }
 
-  @Post('login')
+  @Post('users/login')
   @UsePipes(new BackendValidationPipe())
   async login(
     @Body('user') loginUserDto: LoginUserDto,
