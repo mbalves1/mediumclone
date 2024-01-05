@@ -59,7 +59,6 @@ export class ProfileService {
     }
 
     if (currentUserId === user.id) {
-      console.log('aquui');
       throw new HttpException(
         'Follower and following cant be equal',
         HttpStatus.BAD_REQUEST,
@@ -98,7 +97,6 @@ export class ProfileService {
     }
 
     if (currentUserId === user.id) {
-      console.log('aquui');
       throw new HttpException(
         'Follower and following cant be equal',
         HttpStatus.BAD_REQUEST,
